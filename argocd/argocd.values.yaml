@@ -2,7 +2,7 @@
 # Chart: argo/argo-cd
 #
 # Dev-mode: single replicas everywhere, insecure server (TLS terminated at
-# port-forward boundary), no Dex SSO, no HA Redis. Works on k3d-dev,
+# port-forward boundary), no Dex SSO, no HA Redis. Works on dev,
 # single-node VPS, and multi-node k3s — scale replicas up for HA.
 
 configs:

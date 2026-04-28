@@ -3,7 +3,7 @@
 Platform repository for local and production Kubernetes cluster configuration. Manages a k3d dev cluster, ArgoCD GitOps bootstrap, and the Grafana observability stack.
 
 Target environments:
-- `k3d-dev` (local single node)
+- `dev` (local, 3-node: 1 server + 2 agents)
 - Single-node VPS running k3s
 - 5-node k3s cluster
 
@@ -20,10 +20,10 @@ observability/  Helm values for the Grafana observability stack
 
 ```bash
 # Create
-k3d cluster create --config clusters/k3d-dev.yaml
+k3d cluster create --config clusters/dev.yaml
 
 # Delete
-k3d cluster delete k3d-dev
+k3d cluster delete dev
 ```
 
 ## ArgoCD

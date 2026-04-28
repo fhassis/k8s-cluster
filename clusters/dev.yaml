@@ -1,9 +1,9 @@
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
-  name: k3d-dev
+  name: dev
 servers: 1
-agents: 0 # 0 agents = single node (server acts as worker)
+agents: 2
 image: rancher/k3s:latest
 options:
   k3d:

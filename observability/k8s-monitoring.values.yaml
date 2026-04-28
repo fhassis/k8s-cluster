@@ -12,7 +12,7 @@
 # App workloads need no changes.
 
 cluster:
-  name: k3d-dev
+  name: dev
 
 # ============================================================
 # Destinations (MAP — each key is the destination name)

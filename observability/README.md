@@ -4,7 +4,7 @@ Single-replica, non-HA Grafana stack deployed as five Helm releases into the `ob
 
 Target environments:
 
-- `k3d-dev` (local single node)
+- `dev` (local, 3-node: 1 server + 2 agents)
 - Single-node VPS running k3s
 - 5-node k3s cluster
 
