@@ -1,0 +1,103 @@
+# k8s-monitoring values
+# Chart: grafana/k8s-monitoring (v4.x)
+#
+# Unified collection layer: deploys Alloy (DaemonSet + singleton) via the
+# Alloy Operator, plus node-exporter and kube-state-metrics. Sends:
+#   Metrics → Prometheus (remote_write)
+#   Logs    → Loki (native HTTP push — no OTLP label-demotion issue)
+#   Traces  → Tempo (OTLP gRPC)
+#
+# Grafana Cloud switch: replace destination URLs with Cloud endpoints and
+# add auth blocks (see README). Skip installing the backend charts.
+# App workloads need no changes.
+
+cluster:
+  name: k3d-dev
+
+# ============================================================
+# Destinations (MAP — each key is the destination name)
+# ============================================================
+destinations:
+  prometheus:
+    type: prometheus
+    url: http://prometheus-server.observability.svc.cluster.local:80/api/v1/write
+
+  loki:
+    type: loki
+    url: http://loki.observability.svc.cluster.local:3100/loki/api/v1/push
+
+  # Traces only — metrics and logs go to their own dedicated destinations
+  tempo:
+    type: otlp
+    url: http://tempo.observability.svc.cluster.local:4317
+    protocol: grpc
+    tls:
+      insecure: true  # Tempo gRPC is plaintext (no TLS); insecure=false would trigger TLS handshake
+    metrics:
+      enabled: false
+    logs:
+      enabled: false
+    traces:
+      enabled: true
+
+# ============================================================
+# Collection features
+# ============================================================
+
+# K8s cluster-state metrics (kube-state-metrics, apiserver, kubelet, etc.)
+clusterMetrics:
+  enabled: true
+  collector: alloy-singleton
+
+# Per-node host metrics (node-exporter: CPU, memory, disk, network).
+# linuxHosts.enabled is false by default — must be set explicitly to
+# activate the node-exporter scrape config inside the feature module.
+hostMetrics:
+  enabled: true
+  collector: alloy-metrics
+  linuxHosts:
+    enabled: true
+
+# Kubernetes events as log lines → Loki
+clusterEvents:
+  enabled: true
+  collector: alloy-singleton
+
+# Pod container logs via K8s API → Loki native push (preserves real labels)
+podLogsViaLoki:
+  enabled: true
+  collector: alloy-metrics
+
+# OTLP receiver: apps push traces here, Alloy forwards to Tempo.
+# Must run on singleton — DaemonSet would create N duplicate receivers.
+applicationObservability:
+  enabled: true
+  collector: alloy-singleton
+  receivers:
+    otlp:
+      grpc:
+        enabled: true
+        port: 4317
+      http:
+        enabled: true
+        port: 4318
+
+# ============================================================
+# Collectors (Alloy instances — MAP, managed by Alloy Operator)
+# ============================================================
+# alloy-metrics: DaemonSet (one per node) — node-local scraping + log tailing
+# alloy-singleton: single Deployment — cluster-level work + OTLP reception
+collectors:
+  alloy-metrics:
+    presets: [daemonset, clustered, filesystem-log-reader]
+  alloy-singleton:
+    presets: [singleton]
+
+# ============================================================
+# Telemetry services (deployed as subcharts by k8s-monitoring)
+# ============================================================
+telemetryServices:
+  kube-state-metrics:
+    deploy: true
+  node-exporter:
+    deploy: true

@@ -1,0 +1,36 @@
+# Prometheus values
+# Chart: prometheus-community/prometheus
+#
+# Plain Prometheus server — no Operator, no CRDs. Collection is handled
+# entirely by k8s-monitoring (Alloy), which remote-writes metrics here.
+# node-exporter and kube-state-metrics are disabled: k8s-monitoring
+# deploys them via its telemetryServices subchart.
+
+alertmanager:
+  enabled: false
+
+prometheus-pushgateway:
+  enabled: false
+
+# k8s-monitoring's Alloy deploys these — disable chart's copies
+prometheus-node-exporter:
+  enabled: false
+
+kube-state-metrics:
+  enabled: false
+
+server:
+  # Accept remote_write from Alloy (k8s-monitoring Prometheus destination)
+  extraFlags:
+    - web.enable-remote-write-receiver
+
+  retention: 7d
+
+  persistentVolume:
+    enabled: true
+    size: 10Gi
+    storageClass: local-path
+
+  # Service name: prometheus-server.observability.svc.cluster.local:80
+  service:
+    type: ClusterIP

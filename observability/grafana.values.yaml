@@ -1,0 +1,88 @@
+# Grafana values
+# Chart: grafana/grafana
+#
+# Standalone Grafana. All three datasources pre-wired so the stack is
+# query-ready without any manual UI steps after install.
+
+# dev-only: replace per environment (see README "Secrets" section)
+adminPassword: admin
+
+persistence:
+  enabled: true
+  size: 2Gi
+  storageClassName: local-path
+
+# The init-chown-data container hits "permission denied" on k3d/k3s
+# when chowning a populated PVC. Modern kubelets apply fsGroup, so skip it.
+initChownData:
+  enabled: false
+
+dashboardProviders:
+  dashboardproviders.yaml:
+    apiVersion: 1
+    providers:
+      - name: default
+        folder: ''
+        type: file
+        disableDeletion: false
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+dashboards:
+  default:
+    # Per-node host metrics: CPU, memory, disk I/O, network (requires node-exporter)
+    node-exporter-full:
+      gnetId: 1860
+      revision: 37
+      datasource: Prometheus
+
+    # Cluster-level health: pod counts, resource requests/limits (requires kube-state-metrics)
+    kubernetes-views-global:
+      gnetId: 15760
+      revision: 37
+      datasource: Prometheus
+
+    # Requires prometheus-nats-exporter
+    nats-server:
+      gnetId: 11799
+      revision: 6
+      datasource: Prometheus
+    nats-jetstream:
+      gnetId: 14804
+      revision: 2
+      datasource: Prometheus
+
+    # Requires postgres_exporter (prometheus-community/prometheus-postgres-exporter)
+    postgresql:
+      gnetId: 9628
+      revision: 7
+      datasource: Prometheus
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        url: http://prometheus-server.observability.svc.cluster.local:80
+        isDefault: true
+        jsonData:
+          timeInterval: 30s
+
+      - name: Loki
+        type: loki
+        uid: loki
+        url: http://loki.observability.svc.cluster.local:3100
+        jsonData:
+          maxLines: 1000
+
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        url: http://tempo.observability.svc.cluster.local:3200
+        jsonData:
+          tracesToLogsV2:
+            datasourceUid: loki
+          lokiSearch:
+            datasourceUid: loki

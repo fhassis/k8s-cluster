@@ -1,0 +1,71 @@
+# Loki values
+# Chart: grafana/loki
+#
+# SingleBinary mode: one pod, filesystem storage on a local PVC, single tenant.
+# No object store, no Memcached, no NGINX gateway. Smallest viable Loki.
+
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: filesystem
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+  # Disable structured metadata limits warnings by raising sane caps for a
+  # learning environment.
+  limits_config:
+    retention_period: 168h # 7d, matches Prometheus retention
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: local-path
+
+# Disable everything that's only relevant for SimpleScalable / Distributed.
+read:
+  replicas: 0
+write:
+  replicas: 0
+backend:
+  replicas: 0
+
+# No Memcached caches in non-HA. Loki will use in-process caches.
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+
+# No NGINX gateway — clients hit the loki Service directly on port 3100.
+gateway:
+  enabled: false
+
+# Skip the canary + tests + bundled monitoring sub-chart bits. The
+# kube-prometheus-stack ServiceMonitor selector will pick up Loki's
+# own ServiceMonitor if you flip serviceMonitor.enabled to true later.
+test:
+  enabled: false
+lokiCanary:
+  enabled: false
+monitoring:
+  dashboards:
+    enabled: false
+  rules:
+    enabled: false
+  serviceMonitor:
+    enabled: false
+  selfMonitoring:
+    enabled: false
+    grafanaAgent:
+      installOperator: false

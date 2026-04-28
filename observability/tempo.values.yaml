@@ -1,0 +1,47 @@
+# Tempo values
+# Chart: grafana-community/tempo  (single-binary; NOT tempo-distributed)
+#
+# One pod, local filesystem storage, OTLP receivers on 4317/4318 so
+# k8s-monitoring's Alloy can forward app traces here.
+#
+# grafana-community/tempo and grafana/tempo resolve to the same Helm repo
+# (https://grafana.github.io/helm-charts) — they are aliases. Either works
+# for `helm install`; grafana-community/tempo is the canonical name going
+# forward per ArtifactHub.
+
+tempo:
+  # Local filesystem trace storage (no S3/GCS).
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+
+  # Enable OTLP receivers — gRPC for app SDKs, HTTP for browsers / curl.
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+
+  # Single-tenant, no auth.
+  multitenancyEnabled: false
+
+# Persist traces to a PVC on the default k3s/k3d storage class.
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClassName: local-path
+
+# Single-binary chart deploys one StatefulSet pod by default. No replica
+# overrides needed.
+
+service:
+  type: ClusterIP
+
+# No ServiceMonitor / metrics scraping for now — re-enable when you want
+# Tempo's own metrics in Prometheus.
+serviceMonitor:
+  enabled: false

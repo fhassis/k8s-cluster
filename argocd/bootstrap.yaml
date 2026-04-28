@@ -1,0 +1,26 @@
+# Bootstrap Application — apply this once after ArgoCD is installed.
+#
+# Points ArgoCD at the apps/ directory in this repo. ArgoCD then discovers
+# and manages every Application manifest found there, making all future
+# changes fully GitOps (git push → ArgoCD reconciles).
+#
+# Usage:
+#   kubectl apply -f argocd/bootstrap.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: bootstrap
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fhassis/k3d-cluster.git
+    targetRevision: HEAD
+    path: argocd/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

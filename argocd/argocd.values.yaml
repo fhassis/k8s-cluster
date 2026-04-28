@@ -1,0 +1,38 @@
+# ArgoCD values
+# Chart: argo/argo-cd
+#
+# Dev-mode: single replicas everywhere, insecure server (TLS terminated at
+# port-forward boundary), no Dex SSO, no HA Redis. Works on k3d-dev,
+# single-node VPS, and multi-node k3s — scale replicas up for HA.
+
+configs:
+  params:
+    # No TLS inside the cluster — port-forward or an ingress with TLS
+    # termination handles the encryption boundary.
+    server.insecure: "true"
+  cm:
+    # Allow ArgoCD Applications to live in any namespace (not only argocd).
+    application.namespaces: "*"
+
+# Disable SSO — use the auto-generated admin password for local dev.
+dex:
+  enabled: false
+
+server:
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1
+
+controller:
+  replicas: 1
+
+# Standalone Redis (not HA). Flip to redis-ha.enabled=true for production.
+redis:
+  enabled: true
+
+redis-ha:
+  enabled: false
