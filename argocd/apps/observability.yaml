@@ -15,7 +15,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-prometheus
+  name: prometheus
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -44,7 +44,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-loki
+  name: loki
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -73,7 +73,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-tempo
+  name: tempo
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -102,7 +102,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-grafana
+  name: grafana
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -131,7 +131,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: observability-k8s-monitoring
+  name: k8s-monitoring
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "2"
