@@ -79,6 +79,13 @@ applicationObservability:
         enabled: true
         port: 4318
 
+# Scrape any pod/service annotated with prometheus.io/scrape: "true".
+# This is the reusable pattern for app-level exporters (postgres_exporter,
+# rabbitmq_prometheus, etc.) — no per-app Alloy config changes required.
+annotationAutodiscovery:
+  enabled: true
+  collector: alloy-metrics
+
 # ============================================================
 # Collectors (Alloy instances — MAP, managed by Alloy Operator)
 # ============================================================

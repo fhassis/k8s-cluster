@@ -52,10 +52,17 @@ dashboards:
       revision: 2
       datasource: Prometheus
 
-    # Requires postgres_exporter (prometheus-community/prometheus-postgres-exporter)
+    # Requires postgres_exporter (prometheuscommunity/postgres-exporter)
     postgresql:
       gnetId: 9628
       revision: 7
+      datasource: Prometheus
+
+    # Requires rabbitmq_prometheus plugin (built into rabbitmq:3-management-alpine)
+    # Official dashboard from the RabbitMQ team — matches rabbitmq_* metric names
+    rabbitmq-overview:
+      gnetId: 10991
+      revision: 8
       datasource: Prometheus
 
 datasources:
