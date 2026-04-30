@@ -1,6 +1,4 @@
 # GitLab prod overlay — real domain, TLS, production resource limits.
-# Replace fhassis.top with your actual domain.
-# Replace wildcard-tls with the cert-manager TLS secret name.
 
 global:
   hosts:
@@ -13,9 +11,12 @@ global:
     pages:
       name: pages.fhassis.top
   ingress:
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
     tls:
       enabled: true
-      secretName: wildcard-tls
+      # secretName intentionally absent — Traefik uses TLSStore default (kube-system/wildcard-tls)
 
 gitlab:
   webservice:

@@ -1,0 +1,25 @@
+# Prod-only: applies Traefik TLSStore pointing to kube-system/wildcard-tls.
+# Pre-requisite: import the wildcard cert as a Secret before first sync (see certificates/README.md).
+# Wave -1 ensures TLSStore exists before any application Ingress is created.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: certificates
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fhassis/k3d-cluster.git
+    targetRevision: HEAD
+    path: certificates
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

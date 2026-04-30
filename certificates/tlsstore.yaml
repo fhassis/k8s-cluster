@@ -1,0 +1,16 @@
+# Traefik default TLS store.
+# Any Ingress that declares TLS but omits secretName will use this certificate.
+# Because this is the "default" store, it applies to all namespaces automatically —
+# no per-namespace cert copies needed.
+#
+# The Secret wildcard-tls lives in kube-system alongside Traefik (k3s default).
+# cert-manager writes it there after the Certificate resource is Ready.
+---
+apiVersion: traefik.io/v1alpha1
+kind: TLSStore
+metadata:
+  name: default
+  namespace: kube-system
+spec:
+  defaultCertificate:
+    secretName: wildcard-tls

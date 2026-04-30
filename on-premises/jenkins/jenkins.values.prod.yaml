@@ -1,6 +1,4 @@
 # Jenkins prod overlay — real domain, TLS, production resource limits.
-# Replace jenkins.fhassis.top with your actual domain.
-# Replace wildcard-tls with the cert-manager TLS secret name.
 
 controller:
   jenkinsUrl: "https://jenkins.fhassis.top"
@@ -17,7 +15,10 @@ controller:
     enabled: true
     ingressClassName: traefik
     hostName: jenkins.fhassis.top
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
     tls:
-      - secretName: wildcard-tls
-        hosts:
+      - hosts:
           - jenkins.fhassis.top
+        # secretName intentionally absent — Traefik uses TLSStore default (kube-system/wildcard-tls)

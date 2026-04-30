@@ -1,5 +1,4 @@
 # XWiki prod overlay — real domain, TLS, production resources.
-# Replace xwiki.fhassis.top and wildcard-tls with your actual values.
 
 postgresql:
   auth:
@@ -14,12 +13,15 @@ resources:
     memory: "4Gi"
 
 ingress:
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
     - host: xwiki.fhassis.top
       paths:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: wildcard-tls
-      hosts:
+    - hosts:
         - xwiki.fhassis.top
+      # secretName intentionally absent — Traefik uses TLSStore default (kube-system/wildcard-tls)

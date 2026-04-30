@@ -1,9 +1,12 @@
 ingress:
   enabled: true
   ingressClassName: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
   hosts:
     - grafana.fhassis.top
   tls:
-    - secretName: wildcard-tls
-      hosts:
+    - hosts:
         - grafana.fhassis.top
+      # secretName intentionally absent — Traefik uses TLSStore default (kube-system/wildcard-tls)

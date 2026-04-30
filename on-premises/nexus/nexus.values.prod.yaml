@@ -1,7 +1,6 @@
 # Nexus prod overlay — real domain, TLS, external PostgreSQL.
 # Sonatype strongly recommends PostgreSQL over embedded H2 in containerized prod.
 # Deploy a PostgreSQL instance separately (e.g., via Bitnami chart) before enabling this.
-# Replace nexus.fhassis.top and wildcard-tls with your actual values.
 
 nexus:
   resources:
@@ -14,10 +13,13 @@ nexus:
 
 ingress:
   host: nexus.fhassis.top
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
   tls:
-    - secretName: wildcard-tls
-      hosts:
+    - hosts:
         - nexus.fhassis.top
+      # secretName intentionally absent — Traefik uses TLSStore default (kube-system/wildcard-tls)
 
 # External PostgreSQL connection.
 # Uncomment and configure when PostgreSQL is available.
