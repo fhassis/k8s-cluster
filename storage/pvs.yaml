@@ -1,0 +1,122 @@
+# Static PersistentVolumes for dev (k3d) — one per application PVC.
+#
+# Key design: NO nodeAffinity on any PV.
+# Normally, hostPath PVs created by local-path-provisioner are pinned to a
+# specific node via nodeAffinity, which prevents pod mobility. Here, all k3d
+# nodes mount the same WSL host directory (~/k3d-storage → /data/longhorn), so
+# every node physically has access to the same files. By omitting nodeAffinity,
+# the PVC can bind to any node — exactly what Longhorn provides in prod.
+#
+# Directory structure under ~/k3d-storage/ (created automatically by type: DirectoryOrCreate):
+#   jenkins/
+#   gitlab-gitaly/
+#   gitlab-postgresql/
+#   gitlab-redis/
+#   nexus/
+#   xwiki/
+#   xwiki-postgresql/
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jenkins-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/jenkins
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gitlab-gitaly-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/gitlab-gitaly
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gitlab-postgresql-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/gitlab-postgresql
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: gitlab-redis-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/gitlab-redis
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nexus-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/nexus
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: xwiki-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/xwiki
+    type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: xwiki-postgresql-pv
+spec:
+  storageClassName: longhorn
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: /data/longhorn/xwiki-postgresql
+    type: DirectoryOrCreate

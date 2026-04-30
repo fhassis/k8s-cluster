@@ -1,0 +1,19 @@
+# Jenkins dev overlay — ingress on jenkins.localhost, no TLS, reduced resources.
+
+controller:
+  jenkinsUrl: "http://jenkins.localhost:8080"
+
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hostName: jenkins.localhost
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web

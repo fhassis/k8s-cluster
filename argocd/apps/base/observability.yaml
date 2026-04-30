@@ -7,7 +7,6 @@
 #
 # Env-specific values (ingress, cluster name) are patched in by the
 # dev/ and prod/ Kustomize overlays.
-# targetRevision uses "*" (latest chart) — pin to a semver for production.
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -21,7 +20,7 @@ spec:
   sources:
     - repoURL: https://prometheus-community.github.io/helm-charts
       chart: prometheus
-      targetRevision: "*"
+      targetRevision: "29.3.0"
       helm:
         valueFiles:
           - $values/observability/prometheus.values.yaml
@@ -50,7 +49,7 @@ spec:
   sources:
     - repoURL: https://grafana-community.github.io/helm-charts
       chart: loki
-      targetRevision: "*"
+      targetRevision: "7.0.0"
       helm:
         valueFiles:
           - $values/observability/loki.values.yaml
@@ -79,7 +78,7 @@ spec:
   sources:
     - repoURL: https://grafana-community.github.io/helm-charts
       chart: tempo
-      targetRevision: "*"
+      targetRevision: "1.24.4"
       helm:
         valueFiles:
           - $values/observability/tempo.values.yaml
@@ -108,7 +107,7 @@ spec:
   sources:
     - repoURL: https://grafana-community.github.io/helm-charts
       chart: grafana
-      targetRevision: "*"
+      targetRevision: "10.5.15"
       helm:
         valueFiles:
           - $values/observability/grafana.values.yaml
@@ -137,7 +136,7 @@ spec:
   sources:
     - repoURL: https://grafana.github.io/helm-charts
       chart: k8s-monitoring
-      targetRevision: "*"
+      targetRevision: "4.0.4"
       helm:
         valueFiles:
           - $values/observability/k8s-monitoring.values.yaml

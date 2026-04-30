@@ -1,0 +1,7 @@
+# Longhorn prod overlay — ingress for the Longhorn UI dashboard.
+# Replace longhorn.<domain> with your actual domain.
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  host: longhorn.fhassis.top
+  tls: false

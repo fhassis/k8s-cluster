@@ -1,0 +1,76 @@
+# GitLab base values — Community Edition, full-featured.
+# Dev and prod use the same enabled/disabled component set for true parity.
+# Only resource limits and ingress differ between environments.
+
+global:
+  edition: ce
+
+  # Placeholder — overridden per environment.
+  hosts:
+    domain: localhost
+    https: false
+
+  ingress:
+    class: traefik
+    tls:
+      enabled: false   # overridden to true in prod overlay
+
+  # Enable built-in Prometheus metrics on all GitLab components.
+  # Alloy's annotationAutodiscovery scrapes these automatically.
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: false   # we use annotation-based discovery instead
+
+  # Bundled PostgreSQL and Redis are acceptable for single-node deployments.
+  # For prod, consider switching to an external PostgreSQL for durability.
+  psql: {}   # uses bundled postgresql subchart
+  redis: {}  # uses bundled redis subchart
+
+# Bundled PostgreSQL — Longhorn PVC for mobility.
+postgresql:
+  primary:
+    persistence:
+      storageClass: longhorn
+      size: 10Gi
+
+# Bundled Redis — Longhorn PVC.
+redis:
+  master:
+    persistence:
+      storageClass: longhorn
+      size: 5Gi
+
+# Core components — all enabled (same in dev and prod).
+gitlab:
+  gitaly:
+    persistence:
+      storageClass: longhorn
+      size: 20Gi
+  webservice:
+    minReplicas: 1
+    maxReplicas: 1
+
+# Container Registry — useful for internal teams.
+registry:
+  enabled: true
+  storage:
+    storageClass: longhorn
+    size: 10Gi
+
+# GitLab Pages — internal documentation hosting.
+gitlab-pages:
+  enabled: true
+
+# Components not needed in this setup.
+gitlab-runner:
+  install: false   # runners deployed separately when needed
+
+gitlab-kas:
+  enabled: false   # Kubernetes agent server — not needed
+
+minio:
+  enabled: false   # using Gitaly/local storage, not object storage
+
+nginx-ingress:
+  enabled: false   # using cluster Traefik

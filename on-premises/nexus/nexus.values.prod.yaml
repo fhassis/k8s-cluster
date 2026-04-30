@@ -1,0 +1,34 @@
+# Nexus prod overlay — real domain, TLS, external PostgreSQL.
+# Sonatype strongly recommends PostgreSQL over embedded H2 in containerized prod.
+# Deploy a PostgreSQL instance separately (e.g., via Bitnami chart) before enabling this.
+# Replace nexus.fhassis.top and wildcard-tls with your actual values.
+
+nexus:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+
+ingress:
+  host: nexus.fhassis.top
+  tls:
+    - secretName: wildcard-tls
+      hosts:
+        - nexus.fhassis.top
+
+# External PostgreSQL connection.
+# Uncomment and configure when PostgreSQL is available.
+# nexus:
+#   extraEnvVars:
+#     - name: INSTALL4J_ADD_VM_PARAMS
+#       value: >-
+#         -Xms2703m -Xmx2703m
+#         -XX:MaxDirectMemorySize=2703m
+#         -Djava.util.prefs.userRoot=/nexus-data/javaprefs
+#         -Dnexus.datastore.enabled=true
+#         -Dnexus.datastore.nexus.jdbcUrl=jdbc:postgresql://<pg-host>:5432/nexus
+#         -Dnexus.datastore.nexus.username=nexus
+#         -Dnexus.datastore.nexus.password=<password>

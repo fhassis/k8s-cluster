@@ -1,0 +1,15 @@
+# Dev-only StorageClass named "longhorn" — matches the name used by the real
+# Longhorn operator in prod. Helm values files for all on-premises tools reference
+# storageClass: longhorn, so they work identically in both environments.
+#
+# provisioner: kubernetes.io/no-provisioner means PVs must be pre-created (see pvs.yaml).
+# reclaimPolicy: Retain keeps data after a PVC is deleted — mirrors Longhorn's default.
+# volumeBindingMode: Immediate binds the PVC to the first available matching PV,
+# regardless of which node the pod will land on (required for mobility).
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

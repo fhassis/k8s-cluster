@@ -2,7 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../base
+  - longhorn.yaml   # prod-only: Longhorn block storage operator (wave -1)
 patches:
+  # Observability env-specific values
   - patch: |-
       - op: add
         path: /spec/sources/0/helm/valueFiles/-
@@ -17,3 +19,32 @@ patches:
     target:
       kind: Application
       name: k8s-monitoring
+  # On-premises tools — prod env-specific values (ingress, TLS, resource limits)
+  - patch: |-
+      - op: add
+        path: /spec/sources/0/helm/valueFiles/-
+        value: $values/on-premises/jenkins/jenkins.values.prod.yaml
+    target:
+      kind: Application
+      name: jenkins
+  - patch: |-
+      - op: add
+        path: /spec/sources/0/helm/valueFiles/-
+        value: $values/on-premises/nexus/nexus.values.prod.yaml
+    target:
+      kind: Application
+      name: nexus
+  - patch: |-
+      - op: add
+        path: /spec/sources/0/helm/valueFiles/-
+        value: $values/on-premises/xwiki/xwiki.values.prod.yaml
+    target:
+      kind: Application
+      name: xwiki
+  - patch: |-
+      - op: add
+        path: /spec/sources/0/helm/valueFiles/-
+        value: $values/on-premises/gitlab/gitlab.values.prod.yaml
+    target:
+      kind: Application
+      name: gitlab

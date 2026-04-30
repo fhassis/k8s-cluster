@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - observability.yaml
   - hello-nestjs.yaml
+  - on-premises.yaml

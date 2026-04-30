@@ -1,0 +1,23 @@
+# Dev-only: deploys the shared-hostPath StorageClass and static PVs.
+# Must run before any on-premises app PVC is created (sync wave -1).
+# Not included in the prod overlay — Longhorn handles storage in prod.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dev-storage
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/fhassis/k3d-cluster.git
+    targetRevision: HEAD
+    path: storage
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

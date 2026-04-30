@@ -1,0 +1,25 @@
+# Longhorn base values — applied in prod (k3s on SLES).
+#
+# Design goal: pod mobility, not data redundancy.
+# replicaCount: 1 means each volume has a single replica. Longhorn will still
+# detach the replica from the draining node and reattach it on the target node,
+# giving near-zero-downtime pod migration — which is exactly what we need for
+# rolling OS maintenance. HA replication (replicaCount: 3) can be enabled later.
+defaultSettings:
+  defaultDataPath: /data/longhorn
+  replicaSoftAntiAffinity: true
+  defaultReplicaCount: 1
+  storageMinimalAvailablePercentage: 10
+  upgradeChecker: false
+
+persistence:
+  defaultClass: true
+  defaultClassReplicaCount: 1
+  reclaimPolicy: Retain
+
+longhornUI:
+  replicas: 1
+
+longhornManager:
+  priorityClass:
+    create: false

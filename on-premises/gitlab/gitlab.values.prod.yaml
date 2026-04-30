@@ -1,0 +1,56 @@
+# GitLab prod overlay — real domain, TLS, production resource limits.
+# Replace fhassis.top with your actual domain.
+# Replace wildcard-tls with the cert-manager TLS secret name.
+
+global:
+  hosts:
+    domain: fhassis.top
+    https: true
+    gitlab:
+      name: gitlab.fhassis.top
+    registry:
+      name: registry.fhassis.top
+    pages:
+      name: pages.fhassis.top
+  ingress:
+    tls:
+      enabled: true
+      secretName: wildcard-tls
+
+gitlab:
+  webservice:
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "2Gi"
+      limits:
+        cpu: "2000m"
+        memory: "4Gi"
+  gitaly:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+redis:
+  master:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"

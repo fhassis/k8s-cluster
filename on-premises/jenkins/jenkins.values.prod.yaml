@@ -1,0 +1,23 @@
+# Jenkins prod overlay — real domain, TLS, production resource limits.
+# Replace jenkins.fhassis.top with your actual domain.
+# Replace wildcard-tls with the cert-manager TLS secret name.
+
+controller:
+  jenkinsUrl: "https://jenkins.fhassis.top"
+
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "2000m"
+      memory: "4Gi"
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hostName: jenkins.fhassis.top
+    tls:
+      - secretName: wildcard-tls
+        hosts:
+          - jenkins.fhassis.top

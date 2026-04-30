@@ -1,0 +1,134 @@
+# On-premises tools — base Application manifests
+#
+# Four applications served to internal teams:
+#   Jenkins  — CI/CD automation server
+#   GitLab   — Git hosting, issue tracking, container registry, pages
+#   Nexus    — Artifact repository (Maven, npm, Docker, PyPI)
+#   XWiki    — Internal wiki / knowledge base
+#
+# Sync waves respect startup order and resource weight:
+#   Wave 3 — Jenkins, Nexus, XWiki (independent, lighter)
+#   Wave 4 — GitLab (heaviest, ~8 GB RAM; starts last to avoid node pressure)
+#
+# Storage: all apps use storageClass: longhorn.
+#   Dev  → shared-hostPath simulation (storage/pvs.yaml, no nodeAffinity)
+#   Prod → real Longhorn block storage (deployed at wave -1)
+#
+# Env-specific values (ingress host, TLS, resource limits) are patched in by
+# the dev/ and prod/ Kustomize overlays.
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jenkins
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.jenkins.io
+      chart: jenkins
+      targetRevision: "5.9.18"
+      helm:
+        valueFiles:
+          - $values/on-premises/jenkins/jenkins.values.yaml
+    - repoURL: https://github.com/fhassis/k3d-cluster.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jenkins
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nexus
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  sources:
+    - repoURL: https://sonatype.github.io/helm3-charts/
+      chart: nexus-repository-manager
+      targetRevision: "64.2.0"
+      helm:
+        valueFiles:
+          - $values/on-premises/nexus/nexus.values.yaml
+    - repoURL: https://github.com/fhassis/k3d-cluster.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nexus
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: xwiki
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: default
+  sources:
+    - repoURL: https://xwiki-contrib.github.io/xwiki-helm
+      chart: xwiki
+      targetRevision: "1.6.7"
+      helm:
+        valueFiles:
+          - $values/on-premises/xwiki/xwiki.values.yaml
+    - repoURL: https://github.com/fhassis/k3d-cluster.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: xwiki
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+spec:
+  project: default
+  sources:
+    - repoURL: https://charts.gitlab.io
+      chart: gitlab
+      targetRevision: "9.11.2"
+      helm:
+        valueFiles:
+          - $values/on-premises/gitlab/gitlab.values.yaml
+    - repoURL: https://github.com/fhassis/k3d-cluster.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

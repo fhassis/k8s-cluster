@@ -1,0 +1,17 @@
+# Nexus dev overlay — localhost ingress, embedded H2, reduced resources.
+# H2 is acceptable for drain/migration testing only.
+# Do NOT use H2 in production — data corruption under concurrent writes.
+
+nexus:
+  resources:
+    requests:
+      cpu: "250m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "2Gi"
+
+ingress:
+  host: nexus.localhost
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web

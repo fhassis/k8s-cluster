@@ -3,8 +3,8 @@ kind: Simple
 metadata:
   name: dev
 servers: 1
-agents: 2
-image: rancher/k3s:latest
+agents: 3
+image: rancher/k3s:v1.31.6-k3s1
 ports:
   - port: 8080:80
     nodeFilters:
@@ -12,10 +12,27 @@ ports:
   - port: 8443:443
     nodeFilters:
       - loadbalancer
+volumes:
+  # Shared host directory mounted into every node at /data/longhorn.
+  # Because all k3d nodes are Docker containers on the same WSL host, they all
+  # see the same filesystem — so static PVs using hostPath /data/longhorn/*
+  # require no nodeAffinity: any pod on any node reaches the same data.
+  # This simulates Longhorn's detach/reattach mobility without needing iSCSI.
+  # Run: mkdir -p ~/k3d-storage  before creating the cluster.
+  - volume: "${HOME}/k3d-storage:/data/longhorn"
+    nodeFilters:
+      - all
 options:
   k3d:
     wait: true
-    timeout: "60s"
+    timeout: "120s"
+  k3s:
+    extraArgs:
+      # Disable the network-policy controller to prevent a flannel startup
+      # race condition that causes the k3s server to crash-loop on k3d.
+      - arg: "--disable=network-policy"
+        nodeFilters:
+          - server:*
   kubeconfig:
     updateDefaultKubeconfig: true
     switchCurrentContext: true

@@ -1,0 +1,59 @@
+# Jenkins base values — applied in all environments.
+# Env-specific overlays (jenkins.values.dev.yaml / jenkins.values.prod.yaml)
+# add ingress hostname, TLS, and resource limits on top of this.
+
+controller:
+  # Pin to LTS image tag for stability; override per env if needed.
+  image:
+    tag: "lts"
+
+  installPlugins:
+    - kubernetes:4423.vb_59f230b_ce53
+    - workflow-aggregator:608.v67378e9d3db_1         # Pipeline support
+    - workflow-durable-task-step:1475.ved562f6ec8b_3  # sh/bat steps survive controller restart
+    - git:5.10.1
+    - configuration-as-code:2077.v41f1011a_5110       # JCasC — drives the configScripts below
+    - prometheus:852.v317db_5d17a_b_0                 # Exposes /prometheus for Grafana scraping
+
+  # JCasC: declarative Jenkins configuration — no manual UI setup needed.
+  # The wsl-agent permanent node is pre-configured here. To connect the agent,
+  # retrieve the generated secret from: Manage Jenkins → Nodes → wsl-agent → Status.
+  JCasC:
+    defaultConfig: true
+    configScripts:
+      agents: |
+        jenkins:
+          nodes:
+            - permanent:
+                name: "wsl-agent"
+                labelString: "wsl-agent"
+                remoteFS: "/tmp/jenkins-agent"
+                numExecutors: 2
+                retentionStrategy: "always"
+                launcher:
+                  inbound:
+                    webSocket: true   # Agent connects via WebSocket on port 80 — no extra NodePort needed
+
+  # Prometheus metrics endpoint (served by the prometheus plugin).
+  # Alloy's annotationAutodiscovery will scrape it automatically.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/prometheus"
+
+  # Jenkins URL must be reachable by the WSL agent over WebSocket.
+  # Set per environment via the overlay files.
+  jenkinsUrl: ""
+
+# Persistent Jenkins home (jobs, build history, configuration).
+# storageClass: longhorn works for both dev (shared-hostPath) and prod (Longhorn).
+# Note: persistence is top-level in this chart, not nested under controller.
+persistence:
+  enabled: true
+  storageClass: longhorn
+  size: 20Gi
+
+agent:
+  # Disable the default Kubernetes dynamic agent template — we use a permanent
+  # WSL agent for the drain test. Kubernetes agents can be re-enabled later.
+  enabled: false

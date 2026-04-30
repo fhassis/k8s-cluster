@@ -65,6 +65,25 @@ dashboards:
       revision: 8
       datasource: Prometheus
 
+    # On-premises tools — scraped via Alloy annotationAutodiscovery
+    # Jenkins: requires prometheus plugin installed in Jenkins (see on-premises/jenkins/README.md)
+    jenkins:
+      gnetId: 9964
+      revision: 1
+      datasource: Prometheus
+
+    # GitLab: requires global.metrics.enabled: true in gitlab.values.yaml
+    gitlab:
+      gnetId: 12341
+      revision: 1
+      datasource: Prometheus
+
+    # Nexus OSS: requires pod annotation prometheus.io/scrape: "true" (set in nexus.values.yaml)
+    nexus:
+      gnetId: 16457
+      revision: 1
+      datasource: Prometheus
+
 datasources:
   datasources.yaml:
     apiVersion: 1

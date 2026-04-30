@@ -1,0 +1,62 @@
+# GitLab dev overlay — localhost ingress, no TLS, reduced resource limits.
+# Features are identical to prod (same base values). Only sizing differs.
+
+global:
+  hosts:
+    domain: localhost
+    https: false
+    gitlab:
+      name: gitlab.localhost
+    registry:
+      name: registry.localhost
+    pages:
+      name: pages.localhost
+  ingress:
+    tls:
+      enabled: false
+
+gitlab:
+  webservice:
+    resources:
+      requests:
+        cpu: "300m"
+        memory: "1.5Gi"
+      limits:
+        cpu: "1500m"
+        memory: "3Gi"
+  gitaly:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "200Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
+  workhorse:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "100Mi"
+      limits:
+        cpu: "500m"
+        memory: "500Mi"
+
+postgresql:
+  primary:
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+redis:
+  master:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "64Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"

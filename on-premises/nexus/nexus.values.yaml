@@ -1,0 +1,27 @@
+# Nexus Repository Manager base values — official Sonatype chart.
+# Dev uses the embedded H2 database (acceptable for testing only).
+# Prod overlay switches to external PostgreSQL (see nexus.values.prod.yaml).
+
+nexus:
+  # Persistent blob store — Longhorn PVC for mobility in both dev and prod.
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 20Gi
+
+  # Prometheus metrics scraping.
+  # Alloy's annotationAutodiscovery will scrape /service/metrics/prometheus.
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8081"
+    prometheus.io/path: "/service/metrics/prometheus"
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  # hostname overridden per environment
+  host: nexus.localhost
+
+# Docker registry hosted on Nexus (separate port/ingress in prod).
+# Disabled by default; enable and configure when registry is needed.
+nexusProxyRouteRules: []

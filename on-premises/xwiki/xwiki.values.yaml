@@ -1,0 +1,33 @@
+# XWiki base values — xwiki-contrib/xwiki-helm chart.
+# PostgreSQL is included as a Bitnami subchart.
+# XWiki has no native Prometheus metrics endpoint (JMX only).
+# Logs are collected automatically by Alloy via podLogsViaLoki.
+
+image:
+  tag: "lts-postgres"
+
+persistence:
+  enabled: true
+  storageClass: longhorn
+  size: 10Gi
+
+postgresql:
+  enabled: true
+  auth:
+    database: xwiki
+    username: xwiki
+    password: xwiki   # change in prod using a Kubernetes Secret
+  primary:
+    persistence:
+      storageClass: longhorn
+      size: 5Gi
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  # hostname overridden per environment
+  hosts:
+    - host: xwiki.localhost
+      paths:
+        - path: /
+          pathType: Prefix
