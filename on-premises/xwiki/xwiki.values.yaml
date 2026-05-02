@@ -28,7 +28,7 @@ postgresql:
 
 ingress:
   enabled: true
-  ingressClassName: nginx
+  className: nginx
   # hostname overridden per environment
   hosts:
     - host: xwiki.localhost

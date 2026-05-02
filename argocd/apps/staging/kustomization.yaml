@@ -78,6 +78,13 @@ patches:
   - patch: |-
       - op: add
         path: /spec/sources/0/helm/valueFiles/-
+        value: $values/on-premises/sonarqube/sonarqube.values.staging.yaml
+    target:
+      kind: Application
+      name: sonarqube
+  - patch: |-
+      - op: add
+        path: /spec/sources/0/helm/valueFiles/-
         value: $values/on-premises/gitlab/gitlab.values.staging.yaml
     target:
       kind: Application
