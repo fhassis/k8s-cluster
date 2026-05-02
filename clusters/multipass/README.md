@@ -35,7 +35,7 @@ kubectl -n kube-system delete helmchart traefik traefik-crd --ignore-not-found
 ### 1. Launch node1 (server)
 
 ```bash
-multipass launch --name node1 --cpus 2 --memory 4G --disk 30G \
+multipass launch --name node1 --cpus 4 --memory 8G --disk 30G \
   --cloud-init clusters/multipass/cloud-init-server.yaml 26.04
 ```
 
